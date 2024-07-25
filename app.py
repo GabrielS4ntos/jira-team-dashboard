@@ -49,38 +49,37 @@ def st_metric_cards(
         unsafe_allow_html=True,
     )
 
-########## Dialog
-@st.experimental_dialog("Download das issues do Jira")
+
+########## Parameters to download issues in a JSON file
 def download():
-    jira_url = st.text_input("URL do Jira", value='https://zerumbr.atlassian.net')
-    username = st.text_input("Usuário", '')
-    password = st.text_input("Auth Token", type="password", value='')
-    max_results = st.number_input("Quantidade de resultados", value=100, help='0 significa todos os resultados')
-    jql_query = st.text_input("JQL Query", value="project = 'DATA'")
-    filename = st.text_input("Nome do arquivo")
+    jira_url = st.secrets['JIRA_URL']
+    username = st.secrets['EMAIL']
+    password = st.secrets['API_KEY']
+    max_results = 100
+    jql_query = "project = 'DATA'"
 
-    if st.button("Baixar issues"):
-        if jira_url and username and password and jql_query:
-            with st.spinner(text='Baixando arquivo JSON com issues...'):
-                opts = (
-                    jira_url, username, password, jql_query, max_results,
-                    filename
-                )
-                download_jira_issues(*opts)
-        else:
-            st.error("Por favor, preencha todos os campos.")
+    with st.spinner(text='Baixando arquivo JSON com issues...'):
+        opts = (
+            jira_url, username, password, jql_query, max_results
+        )
+        download_jira_issues(*opts)
+    
+########## Transformando variáveis de data
+def date_convert(data, vars):
+    for var in vars:
+        data[var] = data[var].str.slice(stop=10)
+        data[var] = pd.to_datetime(data[var])
+        
+    return data
 
-
-########## MAIN
-
-### Page config
+## Configurações da página
 st.set_page_config(
     page_title='Dashboard Jira',
     page_icon="📈",
     layout='wide',
 )
 
-### Componentes
+## Componentes
 sidebar = st.sidebar
 container0 = st.container()
 container1 = st.container()
@@ -89,32 +88,21 @@ container3 = st.container()
 container4 = st.container()
 container5 = st.container()
 
-with sidebar:
-    def file_selector(folder_path='./data'):
-        filenames = os.listdir(folder_path)
-        selected_filename = st.selectbox('Selecione um arquivo', [''] + filenames)
-        return os.path.join(folder_path, selected_filename)
+## Faz o download das issues caso ainda não tenha sido feito
+if "download" not in st.session_state:
+    download()
+    st.session_state['download'] = True
 
-    filename = file_selector()
-    st.write('Arquivo selecionado`%s`' % filename)
+filename = os.path.join('./data/jiratasks')
 
-    if "download" not in st.session_state:
-        if st.button("Download das issues do Jira"):
-            download()
- 
-if filename == './data/':
-    st.info("Selecione um arquivo na barra lateral")
-    st.stop()
-
-with open(filename) as f:
+with open(filename) as f: 
     issues_raw = json.load(f)
 
 issues = [JiraIssue(i) for i in issues_raw]
 
 df = pd.DataFrame([i.as_dict() for i in issues])
 
-df['dt_updated'] = df['dt_updated'].str.slice(stop=10)
-df['dt_updated'] = pd.to_datetime(df['dt_updated'])
+df = date_convert(data=df, vars=['df_updated', 'start_sprint'])
 
 zerum_sprint = df['zerum_sprint'].dropna().unique().tolist()
 
@@ -184,7 +172,6 @@ with container2:
             y=alt.Y('count:Q', stack='zero', axis=alt.Axis(format='~s'), title='Contagem'),
             x=alt.X('scope:N', title='Escopo'),
             detail='status:N'
-            # text=alt.Text('count:Q')
           )
 
         chart = bars + text

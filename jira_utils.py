@@ -1,10 +1,6 @@
 import json
 import streamlit as st
-
-from datetime import datetime
-
 from jira import JIRA
-
 
 class JiraIssue():
     OPEN_STATUS = [
@@ -25,6 +21,7 @@ class JiraIssue():
 
         self.project = self._get_attr('fields.project.key')
         self.zerum_sprint = self._get_attr('fields.customfield_10020.name')
+        self.start_sprint = self._get_attr('fields.customfield_10020.startDate')
         self.issue_type = self._get_attr('fields.issuetype.name')
         self.story_points = self._get_attr('fields.customfield_10027')
         self.scope = self._get_attr('fields.customfield_10122.value')
@@ -66,7 +63,7 @@ class JiraIssue():
         return res
 
 # Função para baixar as issues do Jira
-def download_jira_issues(jira_url, username, password, jql_query, max_results, filename):
+def download_jira_issues(jira_url, username, password, jql_query, max_results):
     try:
         # Conectar ao Jira
         jira = JIRA(server=jira_url, basic_auth=(username, password))
@@ -80,11 +77,9 @@ def download_jira_issues(jira_url, username, password, jql_query, max_results, f
             issues_list.append(issue.raw)
         
         # Salvar issues em um arquivo JSON
-        now = datetime.now().strftime('%d-%m-%Y-%H-%M-%S')
-        fname = filename if filename else f'issues-{now}.json'
-        with open(f'./data/{fname}', 'w', encoding='utf-8') as f:
+        with open(f'./data/jiratasks', 'w', encoding='utf-8') as f:
             json.dump(issues_list, f, ensure_ascii=False, indent=4)
         
-        st.success(f"Issues baixadas e salvas com sucesso em {fname}")
+        st.success(f"Issues baixadas e salvas com sucesso!")
     except Exception as e:
         st.error(f"Erro ao baixar issues do Jira: {e}")
