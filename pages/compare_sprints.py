@@ -1,15 +1,13 @@
 import streamlit as st
 import numpy as np
-import plotly.express as px
+import plotly.graph_objects as go
 
-from utils import st_metric_cards, generate_dataframe, indicator_plot, grouping_plot, donuts_plot, grouping_for_date
+from utils import st_metric_cards, generate_dataframe, indicator_plot, grouping_plot, donuts_plot
 
-########## Variáveis
-CUSTOM_COLORS = {'Pronto': '#9FC131', 'Em andamento': '#042940', 'Aberto': '#005C53'}
 
 ## Configurações da página
 st.set_page_config(
-    page_title='Dashboard Jira',
+    page_title='Comparar Sprints',
     page_icon=f"📈",
     layout='wide',
 )
@@ -19,8 +17,6 @@ container0 = st.container()
 container1 = st.container()
 container2 = st.container()
 container3 = st.container()
-container4 = st.container()
-container5 = st.container()
 
 ## Salvando os dados no arquivo JSON e lendo como df
 df = generate_dataframe()
@@ -31,11 +27,11 @@ with container0:
     col1, col2, col3 = st.columns(3)
     
     with col1:
-        st.title('Estatísticas da Sprint')
+        st.title('Comparar sprints')
         st.markdown("_v0.1.0_")
         
     with col3:
-        selected_sprint = st.multiselect('Escolha uma sprint:', [''] + zerum_sprint)
+        selected_sprint = st.multiselect('Escolha as sprints que deseja comparar:', [''] + zerum_sprint, placeholder = "Todas as sprints estão selecionadas.")
 
 if selected_sprint:
     df = df[df['zerum_sprint'].isin(selected_sprint)]
@@ -70,9 +66,9 @@ with container2:
         
         grouping_plot(
             data=df, 
-            xvar='scope', 
+            xvar='zerum_sprint', 
             yvar='status', 
-            title='Quantidade de tarefas por Escopo e Status'
+            title='Quantidade de tarefas por Sprint e Status'
             )
 
 
@@ -91,14 +87,6 @@ with container3:
             yvar='status', 
             title='Quantidade de tarefas por Categoria e Status'
             )
-    
-with container4:
-    
-    grouping_for_date(data=df, datefield='dt_updated')
 
-    
-with container5:
-    with st.expander('Dados dos itens'):
-        st.dataframe(df)
 
-print('--')
+print('**')
