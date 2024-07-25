@@ -102,7 +102,7 @@ issues = [JiraIssue(i) for i in issues_raw]
 
 df = pd.DataFrame([i.as_dict() for i in issues])
 
-df = date_convert(data=df, vars=['df_updated', 'start_sprint'])
+df = date_convert(df, ['dt_updated', 'start_sprint'])
 
 zerum_sprint = df['zerum_sprint'].dropna().unique().tolist()
 

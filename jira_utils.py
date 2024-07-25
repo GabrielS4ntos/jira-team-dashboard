@@ -14,7 +14,7 @@ class JiraIssue():
         'Homologação', 'Em andamento', 'Em desenvolvimento', 'UNDER REVIEW',
         'In Progress'
     ]
-    CLOSED_STATUS = ['Concluído', 'Cancelado', 'Pronto', 'UPDATE TESTCASE', 'Done']
+    CLOSED_STATUS = ['Concluído', 'Cancelado', 'Pronto', 'Done']
 
     def __init__(self, raw: dict) -> None:
         self.raw = raw
