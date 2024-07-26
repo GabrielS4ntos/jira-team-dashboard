@@ -1,4 +1,4 @@
-.streamlit/secrets.toml
+app/.streamlit/secrets.toml
 .DS_Store
 jiratasks
 
