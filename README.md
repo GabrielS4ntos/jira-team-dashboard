@@ -32,7 +32,7 @@ This project allows you to fetch all sprint tasks from the Jira Atlassian API an
 
 2. Run the script:
     ```sh
-    streamlit run app.py
+    streamlit run app/app.py
     ```
 
 2. This will open the app in your browser to view the dashboard.

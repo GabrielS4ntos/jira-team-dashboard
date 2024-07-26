@@ -1,0 +1,9 @@
+services:
+  jira-team-dashboard:
+    build: .
+    image: jira-team-dashboard:latest
+    command: streamlit run app.py --server.headless true --server.port 8501
+    volumes:
+      - ./app:/usr/src/app
+    ports:
+      - 8501:8501
