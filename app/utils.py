@@ -51,9 +51,9 @@ def st_metric_cards(
 
 ########## Parameters to download issues in a JSON file
 def download():
-    jira_url = st.secrets['JIRA_BASE_URL']
-    username = st.secrets['JIRA_EMAIL']
-    password = st.secrets['API_TOKEN']
+    jira_url = os.environ.get('JIRA_BASE_URL')
+    username = os.environ.get('JIRA_EMAIL')
+    password = os.environ.get('API_TOKEN')
     max_results = 100
     jql_query = "project = 'DATA'"
 
