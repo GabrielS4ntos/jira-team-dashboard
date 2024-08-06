@@ -2,7 +2,10 @@ services:
   jira-team-dashboard:
     build: .
     image: jira-team-dashboard:latest
-    command: streamlit run app.py --server.headless true --server.port 8501
+    environment:
+      - JIRA_BASE_URL=https://your-domain.atlassian.net
+      - JIRA_EMAIL=your-email@example.com
+      - JIRA_API_TOKEN=your-api-token
     volumes:
       - ./app:/usr/src/app
     ports:
